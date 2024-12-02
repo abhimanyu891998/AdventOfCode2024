@@ -1,34 +1,14 @@
-#!/bin/bash
-
-# Check if day number is provided
-if [ -z "$1" ]; then
-  echo "Usage: $0 <day_number>"
-  exit 1
-fi
-
-DAY=$1
-DIR="./src/days/day${DAY}"
-FILENAME="${DIR}/day${DAY}.rs"
-INPUT_FILE="${DIR}/input.txt"
-TEST_INPUT_FILE="${DIR}/test_input.txt"
-MOD_FILE="${DIR}/mod.rs"
-PROBLEM_LINK="https://adventofcode.com/2024/day/${DAY}"
-
-# Create a directory for the day's files
-mkdir -p "$DIR"
-
-# Create the day's Rust file with the problem link comment
-cat <<EOL > "$FILENAME"
-// Advent of Code 2024 - Day ${DAY}
-// Problem link: ${PROBLEM_LINK}
+// Advent of Code 2024 - Day 2
+// Problem link: https://adventofcode.com/2024/day/2
 
 pub fn solve() {
-    println!("Solution for Day ${DAY}");
-    let DAY = ${DAY};
+    println!("Solution for Day 2");
+    let DAY = 2;
     let exe_path = std::env::current_exe().unwrap();
     let exe_dir = exe_path.parent().unwrap();
 
     let input_file_path = exe_dir.join(format!("../../src/days/day{}/input.txt", DAY));
+    println!("Input file path: {}", input_file_path.display());
 
     let input_content = match std::fs::read_to_string(input_file_path) {
         Ok(content) => content,
@@ -36,6 +16,7 @@ pub fn solve() {
     };
 
     let test_input_file_path = exe_dir.join(format!("../../src/days/day{}/test_input.txt", DAY));
+    println!("Test input file path: {}", test_input_file_path.display());
 
     let test_input_content = match std::fs::read_to_string(test_input_file_path) {
         Ok(content) => content,
@@ -71,32 +52,3 @@ fn calculate_part_two_result(input: &str) -> String {
     return "Not implemented yet".to_string();
 }
 
-EOL
-
-#Create an empty input.txt file
-touch "$INPUT_FILE"
-touch "$TEST_INPUT_FILE"
-
-# Create the day's mod.rs file
-cat <<EOM > "$MOD_FILE"
-// src/days/day${DAY}/mod.rs
-pub mod day${DAY};
-
-// Re-export everything from day${DAY}
-pub use self::day${DAY}::*;
-EOM
-
-
-
-
-# Update the mod.rs file to include the new module
-echo "pub mod day${DAY};" >> src/days/mod.rs
-
-
-
-# Update the main.rs file to call the new day's solve function
-sed -i '' "/fn main() {/a\\
-    days::day${DAY}::solve();
-" src/main.rs
-
-echo "Generated $FILENAME with problem link $PROBLEM_LINK and input file $INPUT_FILE"
