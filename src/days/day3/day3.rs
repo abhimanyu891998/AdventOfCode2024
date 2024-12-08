@@ -63,29 +63,9 @@ fn calculate_part_two_result(input: &str) -> String {
     let mut stack: Vec<String> = Vec::new();
     
     let mut i = 0;
-    // while i < input.len() {
-    //     if let Some(cap) = mul_regex.captures(&input[i..]) {
-    //         let mul_result = cap[1].parse::<i32>().unwrap() * cap[2].parse::<i32>().unwrap();
-    //         if stack.last() != Some(&"don't()".to_string()) {
-    //             stack.push(mul_result.to_string());
-    //         }
-    //         i += cap.get(0).unwrap().end();
-    //     } else if let Some(cap) = do_regex.captures(&input[i..]) {
-    //         print!("do() ");
-    //         stack.push("do()".to_string());
-    //         i += cap.get(0).unwrap().end();
-    //     } else if let Some(cap) = dont_regex.captures(&input[i..]) {
-    //         print!("don't() ");
-    //         stack.push("don't()".to_string());
-    //         i += cap.get(0).unwrap().end();
-    //     } else {
-    //         i += 1;
-    //     }
-    // }
 
     let mut sum_of_all = 0;
     while i< input.len() {
-        // Check if the current character is a 'm' and then check if the next characters are 'ul(', if yes, then check till the next ')' and confirm if the mul_regex is matched and push the result to the stack
         if input[i..].starts_with("mul(") {
             let mut j = i + 4;
             while j < input.len() && input[j..].starts_with(")") == false {
