@@ -1,5 +1,6 @@
 // Advent of Code 2024 - Day 6
 // Problem link: https://adventofcode.com/2024/day/6
+use std::sync::LazyLock;
 
 pub fn solve() {
     println!("Solution for Day 6");
@@ -21,24 +22,25 @@ pub fn solve() {
         Err(e) => panic!("Something went wrong reading the test input file: {}", e),
     };
 
+    let mut state = VisitationState::new();
+
     // Call solvePartOne with both inputs
-    solvePartOne(&input_content, &test_input_content);
+    solvePartOne(&mut state, &input_content);
 
     // Call solvePartTwo with both inputs
-    solvePartTwo(&input_content, &test_input_content);
+    solvePartTwo(&state, &input_content);
 }
 
-fn solvePartOne(input: &str, test_input: &str) {
+fn solvePartOne(state: &mut VisitationState, input: &str) {
     println!("Part One:");
-    println!("Test input result: {}", calculate_part_one_result(test_input));
-    println!("Input result: {}", calculate_part_one_result(input));
+    println!("Input result: {}", calculate_part_one_result(state, input));
 }
 
-fn solvePartTwo(input: &str, test_input: &str) {
+fn solvePartTwo(state: &VisitationState, input: &str) {
     println!("Part Two:");
-    println!("Test input result: {}", calculate_part_two_result(test_input));
-    println!("Input result: {}", calculate_part_two_result(input));
+    println!("Input result: {}", calculate_part_two_result(state, input));
 }
+
 
 fn get_next_coordinate(i: usize, j: usize, direction: char) -> Option<(usize, usize)> {
     match direction {
@@ -60,7 +62,28 @@ fn get_new_direction(direction: char) -> char {
     }
 }
 
-fn calculate_part_one_result(input: &str) -> String {
+struct VisitationState {
+    visited_cells: std::collections::HashSet<(usize, usize)>,
+}
+
+impl VisitationState {
+    fn new() -> Self {
+        VisitationState {
+            visited_cells: std::collections::HashSet::new(),
+        }
+    }
+
+    fn mark_visited(&mut self, coordinates: (usize, usize)) {
+        self.visited_cells.insert(coordinates);
+    }
+
+    fn has_visited(&self, coordinates: &(usize, usize)) -> bool {
+        self.visited_cells.contains(coordinates)
+    }
+}
+
+
+fn calculate_part_one_result(state: &mut VisitationState, input: &str) -> String {
     // Implement Part One calculation logic here
     let mut input_vec: Vec<Vec<char>> = input.lines().map(|line | line.chars().collect()).collect();
 
@@ -86,6 +109,7 @@ fn calculate_part_one_result(input: &str) -> String {
 
         if input_vec[i][j] != 'X' {
             input_vec[i][j] = 'X';
+            state.mark_visited((i, j));
             total_steps += 1;
         }
 
@@ -146,144 +170,40 @@ fn is_in_loop(input_vec: &Vec<Vec<char>>, i: usize, j: usize, current_direction:
     false
 }
 
-fn calculate_part_two_result(input: &str) -> String {
-    // Implement Part Two calculation logic here
+fn calculate_part_two_result(state: &VisitationState, input: &str) -> String {
+    //Loop through the visited cells and place a barrier there, then check if a loop is created or not and then revert back the barrier
     let mut input_vec: Vec<Vec<char>> = input.lines().map(|line | line.chars().collect()).collect();
+    //Loop through the visited cells and place a barrier there, then check if a loop is created or not and then revert back the barrier
+    let mut total_steps = 0;
 
+    //Get initial position and direction
     let mut initial_i = 0;
     let mut initial_j = 0;
+    let mut initial_direction = '^';
 
-    //Find the initial position of the player
     for i in 0..input_vec.len() {
         for j in 0..input_vec[i].len() {
             if input_vec[i][j] == '^' || input_vec[i][j] == 'v' || input_vec[i][j] == '<' || input_vec[i][j] == '>' {
                 initial_j = j;
                 initial_i = i;
+                initial_direction = input_vec[i][j];
             }
         }
     }
 
-    let mut i = initial_i;
-    let mut j = initial_j;
-    let mut direction = input_vec[i][j];
+    for visited_cell in state.visited_cells.iter() {
+        let i = visited_cell.0;
+        let j = visited_cell.1;
 
-    // Follow the path, at each step, first check if a barrier was placed in the next cell in the same direction, then after that, whatever the new direction would be, in that if in the same column or row (based on the new direction), if there is another barrier, then check if a loop will be created or not, if yes, place a barrier "#" and increment a counter
-    let mut total_steps = 0;
+        input_vec[i][j] = '#';
 
-    // Keep track of discovered loops
-    let mut discovered_loops: std::collections::HashSet<(usize, usize, char)> = std::collections::HashSet::new();
-
- 
-    while i>=0 && i < input_vec.len() && j >= 0 && j < input_vec[i].len() {
-        let next_coordinate = get_next_coordinate(i, j, direction);
-        match next_coordinate {
-            Some(next_coord) => {
-                if next_coord.0 >= 0 && next_coord.0 < input_vec.len() && next_coord.1 >= 0 && next_coord.1 < input_vec[next_coord.0].len() {
-                    if input_vec[next_coord.0][next_coord.1] == '#'{
-                        direction = get_new_direction(direction);
-                    }
-                    else {
-                        if !(next_coord.0 == initial_i && next_coord.1 == initial_j) {
-
-                            input_vec[next_coord.0][next_coord.1] = '#';
-                            
-                            if is_in_loop(&input_vec, i, j, direction) {
-                                total_steps += 1;
-                                //print the grid
-                                for i in 0..input_vec.len() {
-                                    for j in 0..input_vec[i].len() {
-                                        print!("{}", input_vec[i][j]);
-                                    }
-                                    println!();
-                                }
-                                println!();
-                            }
-
-                            input_vec[next_coord.0][next_coord.1] = '.'; // Revert back the barrier
-                        }
-                        
-                        i = next_coord.0;
-                        j = next_coord.1;
-                    }
-                } else {
-                    break;
-                }
-            },
-            None => {
-                // Handle the case when there's no valid next coordinate
-                break;
-            }
+        if is_in_loop(&input_vec, initial_i, initial_j, initial_direction) {
+            total_steps += 1;
         }
+
+        input_vec[i][j] = '.';
     }
 
-    return total_steps.to_string();
+    return total_steps.to_string(); 
+
 }
-
-
-// fn calculate_part_two_result(input: &str) -> String {
-//     // Implement Part Two calculation logic here
-//     let mut input_vec: Vec<Vec<char>> = input.lines().map(|line | line.chars().collect()).collect();
-
-//     let mut initial_i = 0;
-//     let mut initial_j = 0;
-
-//     //Find the initial position of the player
-//     for i in 0..input_vec.len() {
-//         for j in 0..input_vec[i].len() {
-//             if input_vec[i][j] == '^' || input_vec[i][j] == 'v' || input_vec[i][j] == '<' || input_vec[i][j] == '>' {
-//                 initial_j = j;
-//                 initial_i = i;
-//             }
-//         }
-//     }
-
-//     let mut i = initial_i;
-//     let mut j = initial_j;
-//     let mut direction = input_vec[i][j];
-
-//     // Follow the path, at each step, first check if a barrier was placed in the next cell in the same direction, then after that, whatever the new direction would be, in that if in the same column or row (based on the new direction), if there is another barrier, then check if a loop will be created or not, if yes, place a barrier "#" and increment a counter
-//     let mut total_steps = 0;
-
-//     // Keep track of discovered loops
-//     let mut discovered_loops: std::collections::HashSet<(usize, usize, char)> = std::collections::HashSet::new();
-
- 
-//     while i>=0 && i < input_vec.len() && j >= 0 && j < input_vec[i].len() {
-//         let next_coordinate = get_next_coordinate(i, j, direction);
-//         match next_coordinate {
-//             Some(next_coord) => {
-//                 if next_coord.0 >= 0 && next_coord.0 < input_vec.len() && next_coord.1 >= 0 && next_coord.1 < input_vec[next_coord.0].len() {
-//                     if input_vec[next_coord.0][next_coord.1] == '#'{
-//                         direction = get_new_direction(direction);
-//                     }
-//                     else {               
-//                         if !(next_coord.0 == initial_i && next_coord.1 == initial_j) {
-                     
-                            
-//                             input_vec[next_coord.0][next_coord.1] = '#';
-             
-//                                 if is_in_loop(&input_vec, i, j, direction) {
-//                                     total_steps += 1;
-            
-//                                 }
-                   
-//                             input_vec[next_coord.0][next_coord.1] = '.'; // Revert back the barrier
-//                         }
-                        
-//                         i = next_coord.0;
-//                         j = next_coord.1;
-//                     }
-//                 } else {
-//                     break;
-//                 }
-//             },
-//             None => {
-//                 // Handle the case when there's no valid next coordinate
-//                 break;
-//             }
-//         }
-//     }
-
-//     return total_steps.to_string();
-// }
-
