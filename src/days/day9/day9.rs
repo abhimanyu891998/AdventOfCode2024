@@ -203,7 +203,7 @@ fn calculate_part_two_result(input: &str) -> String {
                     value.start_idx = free_space.start_idx;
                     //Remove this free space from the blank spaces
                     blank_spaces.remove(idx);
-                    break; 
+                    break;
                 }
                 if free_space.size > size {
                     value.start_idx = free_space.start_idx;
@@ -211,10 +211,9 @@ fn calculate_part_two_result(input: &str) -> String {
                     free_space.size = free_space.size - size;
                     break;
                 }
-            }
-            else {
+            } else {
                 break;
-            }     
+            }
         }
     }
 
