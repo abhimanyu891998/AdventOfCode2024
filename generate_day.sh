@@ -24,38 +24,38 @@ cat <<EOL > "$FILENAME"
 
 pub fn solve() {
     println!("Solution for Day ${DAY}");
-    let DAY = ${DAY};
+    let day = ${DAY};
     let exe_path = std::env::current_exe().unwrap();
     let exe_dir = exe_path.parent().unwrap();
 
-    let input_file_path = exe_dir.join(format!("../../src/days/day{}/input.txt", DAY));
+    let input_file_path = exe_dir.join(format!("../../src/days/day{}/input.txt", day));
 
     let input_content = match std::fs::read_to_string(input_file_path) {
         Ok(content) => content,
         Err(e) => panic!("Something went wrong reading the input file: {}", e),
     };
 
-    let test_input_file_path = exe_dir.join(format!("../../src/days/day{}/test_input.txt", DAY));
+    let test_input_file_path = exe_dir.join(format!("../../src/days/day{}/test_input.txt", day));
 
     let test_input_content = match std::fs::read_to_string(test_input_file_path) {
         Ok(content) => content,
         Err(e) => panic!("Something went wrong reading the test input file: {}", e),
     };
 
-    // Call solvePartOne with both inputs
-    solvePartOne(&input_content, &test_input_content);
+    // Call solve_part_one with both inputs
+    solve_part_one(&input_content, &test_input_content);
 
-    // Call solvePartTwo with both inputs
-    solvePartTwo(&input_content, &test_input_content);
+    // Call solve_part_two with both inputs
+    solve_part_two(&input_content, &test_input_content);
 }
 
-fn solvePartOne(input: &str, test_input: &str) {
+fn solve_part_one(input: &str, test_input: &str) {
     println!("Part One:");
     println!("Test input result: {}", calculate_part_one_result(test_input));
     println!("Input result: {}", calculate_part_one_result(input));
 }
 
-fn solvePartTwo(input: &str, test_input: &str) {
+fn solve_part_two(input: &str, test_input: &str) {
     println!("Part Two:");
     println!("Test input result: {}", calculate_part_two_result(test_input));
     println!("Input result: {}", calculate_part_two_result(input));
