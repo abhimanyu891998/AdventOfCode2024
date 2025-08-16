@@ -53,7 +53,18 @@ def solve_part_one(input_data):
     return total_count
 
 
+def dfs_part_two(hill_matrix, row, col, prev_value):
+    if not is_valid_coordinate(hill_matrix, row, col):
+        return 0
 
+    if hill_matrix[row][col] != prev_value + 1:
+        return 0
+    
+    
+    if hill_matrix[row][col] == 9:
+        return 1
+    
+    return dfs_part_two(hill_matrix, row + 1, col, hill_matrix[row][col]) + dfs_part_two(hill_matrix, row - 1, col, hill_matrix[row][col]) + dfs_part_two(hill_matrix, row, col + 1, hill_matrix[row][col]) + dfs_part_two(hill_matrix, row, col - 1, hill_matrix[row][col])
 
 
 def solve_part_two(input_data):
@@ -61,7 +72,20 @@ def solve_part_two(input_data):
     Solve part two of the problem.
     """
     # Implement Part Two calculation logic here
-    return "Not implemented yet"
+    hill_matrix = []
+
+    for line in input_data.split("\n"):
+        hill_matrix.append([int(char) for char in line])
+
+    total_count = 0
+    for row in range(len(hill_matrix)):
+        for col in range(len(hill_matrix[row])):
+            if hill_matrix[row][col] == 0:
+                count = dfs_part_two(hill_matrix, row, col, -1)
+                total_count += count
+                
+
+    return total_count
 
 def load_input(filename):
     """
@@ -88,8 +112,8 @@ def main():
     
     # Part Two
     print("Part Two:")
-    # print(f"Test input result: {solve_part_two(test_input)}")
-    # print(f"Actual input result: {solve_part_two(actual_input)}")
+    print(f"Test input result: {solve_part_two(test_input)}")
+    print(f"Actual input result: {solve_part_two(actual_input)}")
 
 if __name__ == "__main__":
     main()
