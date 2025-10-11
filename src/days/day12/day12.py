@@ -60,7 +60,6 @@ def bfs(character_matrix, visited_matrix, r, c, is_part_two = False):
             current_char_value = character_matrix[current_char[0]][current_char[1]]
             if r-1 >=0 and c+1 < len(character_matrix[0]) and (r-1,c) in neighbors and (r,c+1) in neighbors and character_matrix[r-1][c+1] != current_char_value:
                 convex_corners = convex_corners + 1
-                print(f"Found convex corner at ({r}, {c}) - right-top")
             #right-bottom
             if r+1 < len(character_matrix) and c+1 < len(character_matrix[0]) and (r+1,c) in neighbors and (r,c+1) in neighbors and character_matrix[r+1][c+1] != current_char_value:
                 convex_corners = convex_corners + 1
@@ -79,12 +78,9 @@ def bfs(character_matrix, visited_matrix, r, c, is_part_two = False):
                 concave_corners = concave_corners + 1
             if (r+1>=len(character_matrix[1]) or (r+1,c) in non_neighbors) and (c-1<0 or (r,c-1) in non_neighbors):
                 concave_corners = concave_corners + 1
-        
 
-    print("concave corners: ", concave_corners)
-    print("convex corners: ", convex_corners)
-    print("area: ", area)
-    perimeter = convex_corners + concave_corners
+
+            perimeter = convex_corners + concave_corners
             
 
     return area, perimeter
@@ -119,9 +115,6 @@ def solve_part_two(input_data):
         for c in range(len(character_matrix[r])):
             if visited_matrix[r][c] == False:
                 area, perimeter = bfs(character_matrix, visited_matrix, r, c, True)
-                #Print area and perimeter
-                print(f"Char: {character_matrix[r][c]}")
-                print(f"Area: {area}, Perimeter: {perimeter}")
                 final_sum = final_sum + area * perimeter
 
     return final_sum 
